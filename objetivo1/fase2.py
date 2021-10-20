@@ -1,0 +1,5 @@
+print("Hola, somos Time of software , ¿Cómo te llamas?")
+nombre = input()
+print("Nos alegramos mucho de que nos hayas elegido para aprender Python,", nombre)
+edad = input("¿Cuántos años tienes?")
+print("Tienes", edad, "años")
