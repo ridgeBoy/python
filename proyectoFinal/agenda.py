@@ -102,4 +102,220 @@ class Contacto(Persona, Direccion, Telefono):
         print("Email:", self.GetEmail())
         print("--------------")
 
+class Agenda:
+    def __init__(self, path):
+        self.__ListaContactos = []
+        self.__Path = path
 
+    def CargarContactos(self):
+        try:
+            fichero = open(self.__Path, "r")
+        except:
+            print("ERROR: No existe el fichero en la agenda")
+        else:
+            contactos = fichero.readlines()
+            fichero.close()
+            if (len(contactos)>0):
+                for contacto in contactos:
+                    datos = contacto.split("#")
+                    if (len(datos) == 11):
+                        nuevocontacto = Contacto()
+                        nuevocontacto.SetNombre(datos[0])
+                        nuevocontacto.SetApellidos(datos[1])
+                        nuevocontacto.SetFechaNacimiento(datos[2])
+                        nuevocontacto.SetTelefonoMovil(datos[3])
+                        nuevocontacto.SetTelefonoFijo(datos[4])
+                        nuevocontacto.SetTelefonoTrabajo(datos[5])
+                        nuevocontacto.SetCalle(datos[6])
+                        nuevocontacto.SetPiso(datos[7])
+                        nuevocontacto.setCiudad(datos[8])
+                        nuevocontacto.SetCodigoPostal(datos[9])
+                        nuevocontacto.SetEmail(datos[10])
+                        self.__ListaContactos = self.__ListaContactos + [nuevocontacto]
+                    print("INFO: Se han cargado un total de ", len(self.__ListaContactos), " contactos")
+
+    def GuardarContactos(self):
+        try:
+            fichero = open(self.__Path, "w")
+        except:
+            print("ERROR: No se puede guardar")
+        else:
+            for contacto in self.__ListaContactos:
+                texto = contacto.GetNombre() + "#"
+                texto = texto + contacto.GetApellidos() + "#"
+                texto = texto + contacto.GetFechaNacimiento() + "#"
+                texto = texto + contacto.GetTelefonoMovil() + "#"
+                texto = texto + contacto.GetTelefonoFijo() + "#"
+                texto = texto + contacto.GetTelefonoTrabajo() + "#"
+                texto = texto + contacto.GetCalle() + "#"
+                texto = texto + contacto.GetPiso() + "#"
+                texto = texto + contacto.GetCiudad() + "#"
+                texto = texto + contacto.GetCodigoPostal() + "#"
+                texto = texto + contacto.GetEmail() + "\n"
+                fichero.write(texto)
+
+            fichero.close()
+
+    def MostrarAgenda(self):
+        print("####### AGENDA #######")
+        print("Numero de contactos: ", len(self.__ListaContactos))
+        for contacto in self.__ListaContactos:
+            contacto.MostrarContacto()
+
+        print("######################")
+
+    def BuscarContactoPorNombre(self, nombre):
+        listaencontrados = []
+        for contacto in self.__ListaContactos:
+            if contacto.GetNombre() == nombre:
+                listaencontrados = listaencontrados + [contacto]
+        return listaencontrados
+
+    def BuscarContactoPorTelefono(self, telefono):
+        listaencontrados = []
+        for contacto in self.__ListaContactos:
+            if (contacto.GetTelefonoFijo() == telefono or
+                contacto.GetTelefonoMovil() == telefono or
+                contacto.GetTelefonoTrabajo() == telefono) :
+
+                listaencontrados = listaencontrados + [contacto]
+
+        return listaencontrados
+
+    def BorrarContactoPorNombre(self, nombre):
+        listafinal = []
+        for contacto in self.__ListaContactos:
+            if contacto.GetNombre() != nombre:
+                listafinal = listafinal + [contacto]
+
+        print("Info:  ", len(self.__ListaContactos) - len(listafinal) , " han sido borrados")
+        return listafinal
+
+    def BorrarContactoPorTelefono(self,telefono):
+        listafinal = []
+        for contacto in self.__ListaContactos:
+            if (contacto.GetTelefonoFijo() != telefono and
+                    contacto.GetTelefonoMovil() != telefono and
+                    contacto.GetTelefonoTrabajo() != telefono):
+                listafinal = listafinal + [contacto]
+
+        print("Info:  ", len(self.__ListaContactos) - len(listafinal), " han sido borrados")
+        return listafinal
+
+def ObtenerOpcion(texto):
+    leido = False
+    while not leido:
+        try:
+            numero = int(input(texto))
+        except ValueError:
+            print("Error: tienes que introducir un numero")
+        else:
+            leido = True
+
+    return numero
+
+def MostrarMenu():
+    print(''' MENU
+        1) Mostrar contactos
+        2) Buscar contactos
+        3) Crear contacto nuevo
+        4) Borrar contacto
+        5) Guardar contacto
+        6) Salir
+    ''')
+
+def BuscarContactos(agenda):
+    print(''' Buscar contactos por: 
+        2) Nombre
+        1) Telefono
+        3) Volver
+    ''')
+
+    finbuscar = False
+    while not finbuscar:
+        opcbuscar = agenda.ObtenerOpcion("Opcion: ")
+        if opcbuscar == 1:
+            encontrados = agenda.BuscarContactoPorNombre(input("> Introduce el nombre a buscar: "))
+            if len(encontrados) > 0:
+                print("####### CONTACTOS ENCONTRADOS #######")
+                for item in encontrados:
+                    item.MostrarContacto()
+                print("#####################################")
+            else:
+                print("INFO: No se han encontrado contactos")
+
+            finbuscar = True
+
+        elif opcbuscar == 2:
+            encontrados = agenda.BuscarContactoPorTelefono(input("> Introduce el telefono a buscar: "))
+            if len(encontrados) > 0:
+                print("####### CONTACTOS ENCONTRADOS #######")
+                for item in encontrados:
+                    item.MostrarContacto()
+                print("#####################################")
+            else:
+                print("INFO: No se han encontrado contactos")
+
+            finbuscar = True
+
+        elif opcbuscar == 3:
+            finbuscar = True
+
+def ProcesoCrearContacto(agenda):
+    nuevocontacto = Contacto()
+    nuevocontacto.SetNombre(input("> Introduce el nombre del contacto: "))
+    nuevocontacto.SetApellidos(input("> Introduce los apellidos del contacto: "))
+    nuevocontacto.SetFechaNacimiento(input("> Introduce la fecha de nacimiento del contacto: "))
+    nuevocontacto.SetTelefonoMovil(input("> Introduce el telefono movil del contacto: "))
+    nuevocontacto.SetTelefonoFijo(input("> Introduce el telefono fijo del contacto: "))
+    nuevocontacto.SetTelefonoTrabajo(input("> Introduce el telefono de trabajo del contacto: "))
+    nuevocontacto.SetCalle(input("> Introduce la calle del contacto: "))
+    nuevocontacto.SetPiso(input("> Introduce el piso del contacto: "))
+    nuevocontacto.SetCiudad(input("> Introduce la ciudad del contacto: "))
+    nuevocontacto.SetCodigoPostal(input("> Introduce el codigo postal del contacto: "))
+    nuevocontacto.SetEmail(input("> Introduce el email del contacto: "))
+
+    agenda.ProcesoCrearContacto(nuevocontacto)
+
+def BorrarContacto(agenda):
+    print(''' Buscar contacto a borrar por:
+        2) Nombre
+        1) Telefono
+        3) Volver
+    ''')
+
+    finbuscar = False
+    while not finbuscar:
+        opcbuscar = agenda.ObtenerOpcion("Opcion: ")
+        if opcbuscar == 1:
+            agenda.BorrarContactoPorNombre(input("> Introduce el nombre a borrar: "))
+            finbuscar = True
+
+        elif opcbuscar == 2:
+            agenda.BorrarContactoPorTelefono(input("> Introduce el telefono a borrar: "))
+            finbuscar = True
+
+        elif opcbuscar == 3:
+            finbuscar = True
+
+def Main():
+    agenda = Agenda("c:/python/python/proyectoFinal/agenda.txt")
+    agenda.CargarContactos()
+    fin = False
+    while not (fin):
+        MostrarMenu()
+        opc = ObtenerOpcion("Opcion: ")
+        if (opc == 1):
+            agenda.MostrarAgenda()
+        elif (opc == 2):
+            BuscarContactos(agenda)
+        elif (opc == 3):
+            ProcesoCrearContacto(agenda)
+        elif (opc == 4):
+            BorrarContacto(agenda)
+        elif (opc == 5):
+            agenda.GuardarContactos()
+        elif (opc == 6):
+            fin = 1
+
+Main()
