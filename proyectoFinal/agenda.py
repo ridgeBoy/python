@@ -134,6 +134,9 @@ class Agenda:
                         self.__ListaContactos = self.__ListaContactos + [nuevocontacto]
                     print("INFO: Se han cargado un total de ", len(self.__ListaContactos), " contactos")
 
+    def CrearNuevoContacto(self, nuevocontacto):
+        self.__ListaContactos = self.__ListaContactos + [nuevocontacto]
+
     def GuardarContactos(self):
         try:
             fichero = open(self.__Path, "w")
@@ -194,13 +197,14 @@ class Agenda:
     def BorrarContactoPorTelefono(self,telefono):
         listafinal = []
         for contacto in self.__ListaContactos:
-            if (contacto.GetTelefonoFijo() != telefono and
-                    contacto.GetTelefonoMovil() != telefono and
+            if (contacto.GetTelefonoFijo() != telefono or
+                    contacto.GetTelefonoMovil() != telefono or
                     contacto.GetTelefonoTrabajo() != telefono):
                 listafinal = listafinal + [contacto]
 
         print("Info:  ", len(self.__ListaContactos) - len(listafinal), " han sido borrados")
         return listafinal
+
 
 def ObtenerOpcion(texto):
     leido = False
@@ -226,14 +230,14 @@ def MostrarMenu():
 
 def BuscarContactos(agenda):
     print(''' Buscar contactos por: 
-        2) Nombre
-        1) Telefono
+        1) Nombre
+        2) Telefono
         3) Volver
     ''')
 
     finbuscar = False
     while not finbuscar:
-        opcbuscar = agenda.ObtenerOpcion("Opcion: ")
+        opcbuscar = ObtenerOpcion("Opcion: ")
         if opcbuscar == 1:
             encontrados = agenda.BuscarContactoPorNombre(input("> Introduce el nombre a buscar: "))
             if len(encontrados) > 0:
@@ -275,18 +279,18 @@ def ProcesoCrearContacto(agenda):
     nuevocontacto.SetCodigoPostal(input("> Introduce el codigo postal del contacto: "))
     nuevocontacto.SetEmail(input("> Introduce el email del contacto: "))
 
-    agenda.ProcesoCrearContacto(nuevocontacto)
+    agenda.CrearNuevoContacto(nuevocontacto)
 
 def BorrarContacto(agenda):
     print(''' Buscar contacto a borrar por:
-        2) Nombre
-        1) Telefono
+        1) Nombre
+        2) Telefono
         3) Volver
     ''')
 
     finbuscar = False
     while not finbuscar:
-        opcbuscar = agenda.ObtenerOpcion("Opcion: ")
+        opcbuscar = ObtenerOpcion("Opcion: ")
         if opcbuscar == 1:
             agenda.BorrarContactoPorNombre(input("> Introduce el nombre a borrar: "))
             finbuscar = True
